@@ -10,3 +10,116 @@ Jsp 의 특징
 - 스레드 방식으로 실행 (효율적)
 - 클라이언트의 요구를 처리하는 기능은 최초 한번만 메모리에 로드된다
 - 클라이언트가 동일한 기능을 요구하면 기존에 사용한 기능을 재사용
+
+웹 애플리케이션이란
+
+기존의 정적인 웹 애플리케이션의 기능을 그대로 사용하면서 보완하여
+Servlet,  Jsp , java Class 들을 추가하여 사용자에게 동적인 서비스를 제공하는 프로그램
+기존 정적인 웹 애플리케이션의 기능을 그대로 사용하기에 HTML, JS, CSS 등을 사용 가능하다.
+
+Servlet 이란
+
+서버쪽에서 실행되면서 클라이언트의 요청에 따라 동적으로 서비스를 제공하는 자바 클래스.
+*일반 자바 프로그램과 다르게 독자적으로 실행되지 못하고 Jsp/Servlet 컨테이너 (Tomcat)에서 실행.
+
+Servlet 특징
+- 서버에서 실행되면서 기능을 수행
+- 기존의 정적 웹 프로그램의 문제점을 보완하여 동적으로 제공
+- 스레드 방식
+- 자바로 만들어져 자바의 특징을 지님
+- 컨테이너에서 실행
+- 컨테이너 종류에 상관없이 실행(플랫폼 독립적)
+- 보안 기능을 적용하기 쉽다.
+- 웹브라우저(클라이언트) 에서 요청시 기능을 수행.
+
+Servlet의 생명주기
+
+초기화 init()
+- 서블릿 요청시 맨 처음 한번만 호출되어 초기화 작업.
+
+작업수행
+1.doGet
+2.doPost
+- 서블릿 요청시 매번 호출되어 클라이언트가 요청한 작업 수행.
+
+종료 destroy()
+- 서블릿이 기능을 수행하고 메모리에서 소멸될때 호출.
+
+사용자 정의 서블릿 만들기
+1. HttpServlet 클래스를 상속
+2. init(),  doGet()or doPost() , destroy() 메서드를 오버라이딩 하여 생성.
+
+<servlet>           - 브라우저에서 요청하는 매핑 이름에 대해 실제로 실행하는 서블릿 클래스를 설정하는 태그
+<servlet-name>aaa</servlet-name>     - <servlet-mapping> 태그의 <servlet-name> 태그와 값이 같아야한다.
+<servlet-class>sec01.ex01.FirstServlet</servlet-class>      - 브라우저에서 요청하는 매핑 이름에 대해 실제로 기능을 수행하는 서블릿 클래스를 설정.
+</servlet>
+
+<servlet-mapping>
+<servlet-name>aaa</servlet-name>     - 매핑 이름으로 요청시 servlet-name 값이 같은 servlet 태그와 연결
+<url-pattern>/first</url-pattern>     - 브라우저에서 위에서 매칭된 서블릿을 요청하는 논리적인 서블릿 이름.
+</servlet-mapping>
+
+* /first 로 get or post 요청시 FirstServlet 로직이 실행된다.
+
+Annotation 이란.
+- 서블릿을 xml 파일을 이용하여 설정할 경우 복잡해진다.
+따라서 소스코드에 직접 @ 를 이용하여 기능을 설정하는 방법.
+*Tomcat 7 부터 추가되었음.
+
+- 주의할점 : 매핑 이름이 이미 사용된 다른 매핑 이름과 중복되지 않도록 주의한다.
+
+EX)
+
+@WebServlet("/third")
+public class ThirdServlet extends HttpServlet{
+    init 메서드
+    public void init(ServletConfig config)throws ServletException{
+        System.out.println("ThirdServlet init 메서드 호출")
+    }
+
+    doGet...
+
+    doPost...
+}
+
+
+서블릿을 이용한 Form 데이터 처리
+
+<form name="frmLogin" method="GET" action="login">
+아이디 : <input type="text" name"user_id">
+비밀번호 : <input type="password" name="user_pw">
+<input type="submit" value="로그인"
+</form>
+
+login 서블릿으로 Get 방식으로
+name user_id 인 아이디와
+name user_pw 인 비밀번호를 
+input type="submit" 버튼을 이용하여 전송.
+
+*request.getParameter(name) 을 통해 서블릿 에서 받을수 있다.
+
+String user_id = request.getParameter("user_id");
+String user_pw = request.getParameter("user_pw");
+
+여러개의 값을 전달할 경우...
+
+- 같은 name 으로 여러개의 값을 전달하면 배열로 Servlet에 전달된다 .
+Ex)
+<input type="text" name="food" value="치킨">
+<input type="text" name="food" value="피자">
+<input type="text" name="food" value="햄버거">
+<input type="text" name="food" value="초밥">
+
+*배열로 받을때는 getParameterValues() 메서드!!
+String[] food = request.getParameterValues("food");
+
+
+전달되는 값이 너무 많을경우
+Enumeration enu = request.getParameterNames();
+while(enu.hasMoreElements()){
+    String name = (String)enu.nextElement();
+    String[]values = request.getParameterValues(name);
+    for(String value: values){
+        System.out.println("name="+name+",value="+value);
+    }
+}
